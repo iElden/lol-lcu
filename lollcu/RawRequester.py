@@ -10,12 +10,13 @@ class RawRequester:
         self.auth = aiohttp.BasicAuth(login, password=passwd, encoding='UTF-8')
         self.headers = headers
 
-    async def raw_request(self, method: str, url: str, data : Optional[dict]=None, headers : Optional[dict]=None) -> Optional[Any]:
+    async def raw_request(self, method: str, url: str, query : Optional[Dict[str, Any]]=None, body : Optional[Any]=None, headers : Optional[dict]=None) -> Optional[Any]:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
             response = await session.request(method, self.base_url + url,
                                              headers={**self.headers, **headers} if headers else self.headers,
                                              auth=self.auth,
-                                             json=data)
+                                             params=query,
+                                             json=body)
             if response.status // 100 in [4, 5]:
                 raise HTTPException(f"Request {method} {url} return status code {response.status}")
             r = await response.text()
@@ -26,14 +27,14 @@ class RawRequester:
     async def get(self, url : str, headers : Optional[dict]=None) -> Optional[Any]:
         return await self.raw_request('GET', url, headers=headers)
 
-    async def post(self, url : str, data : Optional[dict]=None, headers : Optional[dict]=None) -> Optional[Any]:
-        return await self.raw_request('POST', url, data=data, headers=headers)
+    async def post(self, url : str, query : Optional[Dict[str, Any]], body : Optional[Any]=None, headers : Optional[dict]=None) -> Optional[Any]:
+        return await self.raw_request('POST', url, query=query, body=body, headers=headers)
 
-    async def put(self, url : str, data : Optional[dict]=None, headers : Optional[dict]=None) -> Optional[Any]:
-        return await self.raw_request('PUT', url, data=data, headers=headers)
+    async def put(self, url : str, query : Optional[Dict[str, Any]], body : Optional[Any]=None, headers : Optional[dict]=None) -> Optional[Any]:
+        return await self.raw_request('PUT', url, query=query, body=body, headers=headers)
 
-    async def patch(self, url : str, data : Optional[dict]=None, headers : Optional[dict]=None) -> Optional[Any]:
-        return await self.raw_request('PATCH', url, data=data, headers=headers)
+    async def patch(self, url : str, query : Optional[Dict[str, Any]], body : Optional[Any]=None, headers : Optional[dict]=None) -> Optional[Any]:
+        return await self.raw_request('PATCH', url, query=query, body=body, headers=headers)
 
     async def delete(self, url : str, headers : Optional[dict]=None) -> Optional[Any]:
         return await self.raw_request('PATCH', url, headers=headers)

@@ -164,7 +164,7 @@ class Connector:
     @property
     def url(self) -> str:
         """A url using the current lock file data"""
-        return f'{self.protocol}://{self.address}:{self.port}/'
+        return f'{self.protocol}://{self.address}:{self.port}'
 
     @property
     def auth(self) -> Tuple[str]:
